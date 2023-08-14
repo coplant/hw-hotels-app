@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from starlette import status
 from starlette.responses import Response
 
 from app.users.auth import get_hashed_password, authenticate_user, create_access_token
+from app.users.dependencies import get_current_user
+from app.users.models import Users
 from app.users.schemas import SUserAuth
 from app.users.services import UserService
 
@@ -34,3 +36,8 @@ async def login_user(user_data: SUserAuth, response: Response):
 @router.post("/logout")
 async def logout_user(response: Response):
     response.delete_cookie("access_token")
+
+
+@router.get("/me")
+async def get_user_me(current_user: Users = Depends(get_current_user)):
+    return current_user
