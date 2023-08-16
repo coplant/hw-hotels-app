@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends
-from starlette import status
-from starlette.responses import Response
+from fastapi import APIRouter, Depends, status
+from fastapi.responses import Response
 
+from app import exceptions as ex
 from app.users.auth import get_hashed_password, authenticate_user, create_access_token
 from app.users.dependencies import get_current_user
 from app.users.models import Users
@@ -15,11 +15,11 @@ router = APIRouter(tags=["Users"], prefix="/auth")
 async def register_user(user_data: SUserAuth):
     existing_user = await UserService.find_one_or_none(email=user_data.email)
     if existing_user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT)
+        raise ex.UserAlreadyExistsException
     hashed_password = get_hashed_password(user_data.password)
     user_id = await UserService.add(email=user_data.email, hashed_password=hashed_password)
     if not user_id:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        raise ex.BookingException()
     return {"id": user_id}
 
 
@@ -27,7 +27,7 @@ async def register_user(user_data: SUserAuth):
 async def login_user(user_data: SUserAuth, response: Response):
     user = await authenticate_user(user_data.email, user_data.password)
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise ex.InvalidEmailOrPasswordException
     access_token = create_access_token({"sub": str(user.id)})
     response.set_cookie("access_token", access_token, httponly=True)
     return {"access_token": access_token}
