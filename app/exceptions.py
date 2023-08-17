@@ -38,3 +38,8 @@ class UserAlreadyExistsException(BookingException):
 class InvalidEmailOrPasswordException(BookingException):
     status_code = status.HTTP_401_UNAUTHORIZED
     detail = "Invalid email or password"
+
+
+class NoRoomAvailableException(BookingException):
+    status_code = status.HTTP_409_CONFLICT
+    detail = "No room available"
