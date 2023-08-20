@@ -7,6 +7,6 @@ class Hotels(Base):
     id: int = Column(Integer, primary_key=True)
     name: str = Column(String, nullable=False)
     location: str = Column(String, nullable=False)
-    services: dict = Column(JSON)
+    services: list[str] = Column(JSON)
     rooms_quantity: int = Column(Integer, nullable=False)
     image_id: int = Column(Integer)
