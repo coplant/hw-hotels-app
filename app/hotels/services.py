@@ -15,7 +15,7 @@ class HotelService(BaseService):
     @classmethod
     async def find_by_location(cls, location: str):
         async with async_session_maker() as session:
-            query = select(Hotels).filter(Hotels.location.icontains(location))
+            query = select(cls.model).filter(cls.model.location.icontains(location))
             result = await session.execute(query)
             return result.scalars().all()
 
@@ -41,5 +41,4 @@ class HotelService(BaseService):
                     rooms_left=rooms_left
                 )
             )
-
         return result
