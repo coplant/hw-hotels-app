@@ -9,6 +9,6 @@ class Rooms(Base):
     name: str = Column(String, nullable=False)
     description: str = Column(String)
     price: int = Column(Integer, nullable=False)
-    services: dict = Column(JSON)
+    services: list[str] = Column(JSON)
     quantity: int = Column(Integer, nullable=False)
     image_id: int = Column(Integer)
