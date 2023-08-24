@@ -3,8 +3,10 @@ from datetime import date
 from fastapi import APIRouter, Depends
 
 from app import exceptions as ex
-from app.bookings.schemas import SBooking
+from app.bookings.schemas import SUserBooking
 from app.bookings.services import BookingService
+from app.hotels.rooms.services import RoomService
+from app.hotels.services import HotelService
 from app.users.dependencies import get_current_user
 from app.users.models import Users
 
@@ -12,8 +14,29 @@ router = APIRouter(prefix="/bookings", tags=["Bookings"])
 
 
 @router.get("")
-async def get_bookings(user: Users = Depends(get_current_user)) -> list[SBooking]:
-    return await BookingService.find_all(user_id=user.id)
+async def get_bookings(user: Users = Depends(get_current_user)) -> list[SUserBooking]:
+    bookings = await BookingService.find_all(user_id=user.id)
+    result = []
+    for booking in bookings:
+        room = await RoomService.find_by_id(booking.room_id)
+        hotel = await HotelService.find_by_id(room.hotel_id)
+        result.append(
+            SUserBooking(
+                id=booking.id,
+                room_id=booking.room_id,
+                user_id=booking.user_id,
+                date_from=booking.date_from,
+                date_to=booking.date_to,
+                price=booking.price,
+                total_cost=booking.total_cost,
+                total_days=booking.total_days,
+                image_id=hotel.image_id,
+                name=hotel.name,
+                description=room.description,
+                services=hotel.services,
+            )
+        )
+    return result
 
 
 @router.post("")
