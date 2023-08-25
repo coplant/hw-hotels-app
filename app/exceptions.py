@@ -43,3 +43,8 @@ class InvalidEmailOrPasswordException(BookingException):
 class NoRoomAvailableException(BookingException):
     status_code = status.HTTP_409_CONFLICT
     detail = "No room available"
+
+
+class NoBookingFoundException(BookingException):
+    status_code = status.HTTP_404_NOT_FOUND
+    detail = "No booking found"

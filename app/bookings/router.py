@@ -1,6 +1,6 @@
 from datetime import date
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 
 from app import exceptions as ex
 from app.bookings.schemas import SUserBooking
@@ -47,4 +47,12 @@ async def add_booking(
     booking = await BookingService.add(user.id, room_id, date_from, date_to)
     if not booking:
         raise ex.NoRoomAvailableException
+    return booking
+
+
+@router.delete("/{booking_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_booking(booking_id: int, user: Users = Depends(get_current_user)):
+    booking = await BookingService.delete(user, booking_id)
+    if not booking:
+        raise ex.NotFoundException
     return booking

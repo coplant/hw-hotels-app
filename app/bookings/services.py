@@ -1,4 +1,4 @@
-from sqlalchemy import select, or_, and_, func, between, insert
+from sqlalchemy import select, or_, and_, func, between, insert, delete
 
 from app.bookings.models import Bookings
 from app.database import async_session_maker
@@ -50,3 +50,16 @@ class BookingService(BaseService):
                 return new_booking.scalar()
             else:
                 return None
+
+    @classmethod
+    async def delete(cls, current_user, booking_id: int):
+        async with async_session_maker() as session:
+            delete_query = delete(cls.model).where(
+                and_(
+                    cls.model.id == booking_id,
+                    cls.model.user_id == current_user.id
+                )
+            ).returning(cls.model.id)
+            delete_booking = await session.execute(delete_query)
+            await session.commit()
+            return delete_booking.scalar()
