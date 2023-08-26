@@ -11,6 +11,11 @@ class BookingException(HTTPException):
         super().__init__(status_code=status_code, detail=detail)
 
 
+class NotFoundException(BookingException):
+    status_code = status.HTTP_404_NOT_FOUND
+    detail = "Not found"
+
+
 class TokenNotFoundException(BookingException):
     status_code = status.HTTP_401_UNAUTHORIZED
     detail = "Token not found"
@@ -43,8 +48,3 @@ class InvalidEmailOrPasswordException(BookingException):
 class NoRoomAvailableException(BookingException):
     status_code = status.HTTP_409_CONFLICT
     detail = "No room available"
-
-
-class NoBookingFoundException(BookingException):
-    status_code = status.HTTP_404_NOT_FOUND
-    detail = "No booking found"
