@@ -22,9 +22,20 @@ class SecuritySettings(BaseSettings):
     access_token_expire_minutes: int = Field(30, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
 
 
+class RedisSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="allow")
+    host: str = Field("localhost", alias="REDIS_HOST")
+    port: int = Field(6379, alias="REDIS_PORT")
+
+    def __init__(self):
+        super().__init__()
+        self.url: str = f"redis://{self.host}:{self.port}"
+
+
 class Settings(BaseSettings):
     db: DatabaseSettings = DatabaseSettings()
     security: SecuritySettings = SecuritySettings()
+    redis: RedisSettings = RedisSettings()
 
 
 settings = Settings()
